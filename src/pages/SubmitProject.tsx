@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Github, Globe } from "lucide-react";
+import { Github, Globe, Twitter } from "lucide-react";
 
 const SubmitProject = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const SubmitProject = () => {
     description: "",
     websiteUrl: "",
     githubUrl: "",
-    tags: "",
+    twitterProfile: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +38,7 @@ const SubmitProject = () => {
           description: formData.description,
           website_url: formData.websiteUrl,
           github_url: formData.githubUrl,
-          tags: formData.tags.split(",").map((tag) => tag.trim()),
+          twitter_profile: formData.twitterProfile,
           user_id: user.id,
         },
       ]);
@@ -103,7 +103,7 @@ const SubmitProject = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium" htmlFor="websiteUrl">
-                  Website URL
+                  URL
                 </label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -111,6 +111,7 @@ const SubmitProject = () => {
                     id="websiteUrl"
                     type="url"
                     className="pl-10"
+                    required
                     value={formData.websiteUrl}
                     onChange={(e) =>
                       setFormData({ ...formData, websiteUrl: e.target.value })
@@ -129,6 +130,7 @@ const SubmitProject = () => {
                     id="githubUrl"
                     type="url"
                     className="pl-10"
+                    required
                     value={formData.githubUrl}
                     onChange={(e) =>
                       setFormData({ ...formData, githubUrl: e.target.value })
@@ -138,17 +140,22 @@ const SubmitProject = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="tags">
-                  Tags (comma-separated)
+                <label className="text-sm font-medium" htmlFor="twitterProfile">
+                  Twitter Profile
                 </label>
-                <Input
-                  id="tags"
-                  placeholder="react, typescript, tailwind"
-                  value={formData.tags}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tags: e.target.value })
-                  }
-                />
+                <div className="relative">
+                  <Twitter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <Input
+                    id="twitterProfile"
+                    className="pl-10"
+                    placeholder="@username"
+                    required
+                    value={formData.twitterProfile}
+                    onChange={(e) =>
+                      setFormData({ ...formData, twitterProfile: e.target.value })
+                    }
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end space-x-4">

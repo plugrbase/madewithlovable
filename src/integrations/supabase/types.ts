@@ -64,6 +64,7 @@ export type Database = {
           is_featured: boolean | null
           tags: string[] | null
           title: string
+          twitter_profile: string | null
           updated_at: string
           user_id: string
           views_count: number | null
@@ -78,6 +79,7 @@ export type Database = {
           is_featured?: boolean | null
           tags?: string[] | null
           title: string
+          twitter_profile?: string | null
           updated_at?: string
           user_id: string
           views_count?: number | null
@@ -92,6 +94,7 @@ export type Database = {
           is_featured?: boolean | null
           tags?: string[] | null
           title?: string
+          twitter_profile?: string | null
           updated_at?: string
           user_id?: string
           views_count?: number | null
