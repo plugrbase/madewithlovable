@@ -37,8 +37,19 @@ const fetchFeaturedProject = async () => {
   return data;
 };
 
+const fetchCategories = async () => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('name');
+
+  if (error) throw error;
+  return data;
+};
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -65,12 +76,18 @@ const Index = () => {
     queryFn: fetchFeaturedProject,
   });
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+
   const filteredProjects = projects.filter(project =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (selectedCategory ? project.tags?.includes(selectedCategory) : true) &&
+    (project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.tags?.some(tag => 
       tag.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    ))
   );
 
   return (
@@ -121,6 +138,27 @@ const Index = () => {
               <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>
+          </div>
+          <div className="max-w-4xl mx-auto mt-6 mb-12 flex flex-wrap gap-2 justify-center">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`rounded-full ${!selectedCategory ? 'bg-primary text-white hover:bg-primary/90' : ''}`}
+              onClick={() => setSelectedCategory(null)}
+            >
+              All
+            </Button>
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant="outline"
+                size="sm"
+                className={`rounded-full ${selectedCategory === category.name ? 'bg-primary text-white hover:bg-primary/90' : ''}`}
+                onClick={() => setSelectedCategory(category.name)}
+              >
+                {category.name}
+              </Button>
+            ))}
           </div>
         </div>
       </section>
