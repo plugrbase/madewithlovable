@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -94,12 +93,7 @@ const Index = () => {
     <div className="min-h-screen bg-secondary">
       <section className="pt-6 pb-8 px-4 animate-fadeIn">
         <div className="container">
-          <div className="flex justify-between items-center mb-8">
-            <img 
-              src="/lovable-uploads/9102f3d4-a8bd-4d66-9ba7-bcd348cfeac2.png"
-              alt="Made with Lovable Logo" 
-              className="h-10"
-            />
+          <div className="flex justify-end mb-8">
             {isAuthenticated ? (
               <Button asChild>
                 <Link to="/submit">
