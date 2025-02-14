@@ -92,9 +92,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <section className="pt-6 pb-8 px-4 text-center animate-fadeIn">
+      <section className="pt-6 pb-8 px-4 animate-fadeIn">
         <div className="container">
-          <div className="flex justify-end mb-8">
+          <div className="flex justify-between items-center mb-8">
+            <img 
+              src="/lovable-uploads/9102f3d4-a8bd-4d66-9ba7-bcd348cfeac2.png"
+              alt="Made with Lovable Logo" 
+              className="h-10"
+            />
             {isAuthenticated ? (
               <Button asChild>
                 <Link to="/submit">
@@ -112,11 +117,6 @@ const Index = () => {
             )}
           </div>
           <div className="flex flex-col items-center justify-center mb-8">
-            <img 
-              src="/lovable-uploads/9102f3d4-a8bd-4d66-9ba7-bcd348cfeac2.png"
-              alt="Made with Lovable Logo" 
-              className="h-24 mb-6"
-            />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Made with Lovable
             </h1>
