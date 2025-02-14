@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,9 +24,9 @@ const fetchFeaturedProject = async () => {
     .from('projects')
     .select('*')
     .eq('is_featured', true)
-    .single();
+    .maybeSingle();
 
-  if (error && error.code !== 'PGRST116') throw error;
+  if (error) throw error;
   return data;
 };
 
