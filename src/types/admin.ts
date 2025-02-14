@@ -3,6 +3,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
+  short_description?: string;
   image_url: string | null;
   website_url: string | null;
   github_url: string | null;

@@ -120,6 +120,7 @@ export type Database = {
           image_url: string | null
           is_featured: boolean | null
           publish_date: string | null
+          short_description: string | null
           status: string
           tags: string[] | null
           title: string
@@ -138,6 +139,7 @@ export type Database = {
           image_url?: string | null
           is_featured?: boolean | null
           publish_date?: string | null
+          short_description?: string | null
           status?: string
           tags?: string[] | null
           title: string
@@ -156,6 +158,7 @@ export type Database = {
           image_url?: string | null
           is_featured?: boolean | null
           publish_date?: string | null
+          short_description?: string | null
           status?: string
           tags?: string[] | null
           title?: string

@@ -8,12 +8,13 @@ interface ProjectCardProps {
   id: string;
   title: string;
   description: string;
+  shortDescription?: string;
   imageUrl: string;
   tags?: string[];
   views?: number;
 }
 
-const ProjectCard = ({ id, title, description, imageUrl, tags, views }: ProjectCardProps) => {
+const ProjectCard = ({ id, title, description, shortDescription, imageUrl, tags, views }: ProjectCardProps) => {
   return (
     <Link to={`/project/${id}`}>
       <Card className="overflow-hidden transition-all hover:shadow-lg">
@@ -26,7 +27,9 @@ const ProjectCard = ({ id, title, description, imageUrl, tags, views }: ProjectC
         </div>
         <CardContent className="p-4">
           <h3 className="font-semibold mb-2 line-clamp-1">{title}</h3>
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+            {shortDescription || description}
+          </p>
           {tags && tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (

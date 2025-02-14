@@ -58,6 +58,7 @@ const Admin = () => {
         .update({
           title: updatedProject.title,
           description: updatedProject.description,
+          short_description: updatedProject.short_description,
           website_url: updatedProject.website_url,
           github_url: updatedProject.github_url,
           twitter_profile: updatedProject.twitter_profile,

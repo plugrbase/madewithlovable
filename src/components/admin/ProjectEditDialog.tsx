@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +58,6 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
     e.preventDefault();
     setUploadingImage(true);
 
-    // If there's an existing image, delete it first
     if (imageFile && editingProject.image_url) {
       const oldImagePath = editingProject.image_url.split('/').pop();
       if (oldImagePath) {
@@ -70,18 +68,14 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
     }
 
     try {
-      // First save the project
       await onSave(editingProject, imageFile);
 
-      // Then update the project categories
       if (project) {
-        // Delete existing categories
         await supabase
           .from('project_categories')
           .delete()
           .eq('project_id', project.id);
 
-        // Insert new categories
         if (selectedCategories.length > 0) {
           await supabase
             .from('project_categories')
@@ -123,6 +117,20 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
               onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="shortDescription">Short Description (for thumbnails)</Label>
+            <Textarea
+              id="shortDescription"
+              value={editingProject.short_description || ''}
+              onChange={(e) => setEditingProject({ ...editingProject, short_description: e.target.value })}
+              placeholder="Brief description for project cards (max 150 characters)"
+              maxLength={150}
+            />
+            <p className="text-sm text-gray-500">
+              {((editingProject.short_description?.length || 0) + '/150')} characters
+            </p>
           </div>
 
           <div className="space-y-2">
