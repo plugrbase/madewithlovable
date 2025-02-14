@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -95,9 +96,9 @@ const Index = () => {
           </div>
           <div className="flex flex-col items-center justify-center mb-8">
             <img 
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+              src="/lovable-uploads/2678d175-a9a7-4fe0-a822-5e29500a7c09.png"
               alt="Made with Lovable Logo" 
-              className="w-32 h-32 object-cover rounded-xl mb-6"
+              className="h-24 mb-6"
             />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Made with Lovable
