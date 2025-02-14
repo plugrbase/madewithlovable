@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -75,56 +74,56 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
-      {/* Hero Section */}
-      <section className="py-20 px-4 text-center animate-fadeIn">
-        <div className="flex justify-end container mb-4 gap-4">
-          {isAuthenticated ? (
-            <Button asChild>
-              <Link to="/submit">
-                <Plus className="mr-2 h-4 w-4" />
-                Submit Project
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild variant="outline">
-              <Link to="/auth">
-                <LogIn className="mr-2 h-4 w-4" />
-                Sign In
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div className="flex flex-col items-center justify-center mb-8">
-          <img 
-            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
-            alt="Made with Lovable Logo" 
-            className="w-32 h-32 object-cover rounded-xl mb-6"
-          />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Made with Lovable
-          </h1>
-          <p className="text-xl text-gray-600">
-            A collection of projects made with Lovable
-          </p>
-        </div>
-        <div className="max-w-2xl mx-auto flex gap-4 mb-12">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input 
-              className="pl-10" 
-              placeholder="Search projects..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <section className="pt-6 pb-20 px-4 text-center animate-fadeIn">
+        <div className="container">
+          <div className="flex justify-end mb-8">
+            {isAuthenticated ? (
+              <Button asChild>
+                <Link to="/submit">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Submit Project
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link to="/auth">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Link>
+              </Button>
+            )}
           </div>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
+          <div className="flex flex-col items-center justify-center mb-8">
+            <img 
+              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+              alt="Made with Lovable Logo" 
+              className="w-32 h-32 object-cover rounded-xl mb-6"
+            />
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Made with Lovable
+            </h1>
+            <p className="text-xl text-gray-600">
+              A collection of projects made with Lovable
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto flex gap-4 mb-12">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input 
+                className="pl-10" 
+                placeholder="Search projects..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+          </div>
         </div>
       </section>
 
-      {/* Featured Project */}
       {featuredProject && (
         <section className="container mb-20">
           <h2 className="text-2xl font-semibold mb-6">Featured Project</h2>
@@ -138,7 +137,6 @@ const Index = () => {
         </section>
       )}
 
-      {/* Projects Grid */}
       <section className="container mb-20">
         <h2 className="text-2xl font-semibold mb-6">Latest Projects</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -156,14 +154,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Newsletter */}
       <section className="container mb-20">
         <div className="max-w-xl mx-auto">
           <NewsletterForm />
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-white py-12">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
