@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -61,7 +62,7 @@ const Index = () => {
   const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.tags.some((tag: string) => 
+    project.tags?.some(tag => 
       tag.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
@@ -119,7 +120,7 @@ const Index = () => {
             description={featuredProject.description}
             imageUrl={featuredProject.image_url || "/placeholder.svg"}
             tags={featuredProject.tags}
-            link={featuredProject.website_url || "#"}
+            link={`/project/${featuredProject.id}`}
           />
         </section>
       )}
@@ -131,6 +132,7 @@ const Index = () => {
           {filteredProjects.map((project) => (
             <ProjectCard 
               key={project.id}
+              id={project.id}
               title={project.title}
               description={project.description}
               imageUrl={project.image_url || "/placeholder.svg"}
@@ -162,7 +164,7 @@ const Index = () => {
               <h3 className="font-semibold mb-4">Resources</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li><a href="#" className="hover:text-primary">Documentation</a></li>
-                <li><a href="#" className="hover:text-primary">Submit Project</a></li>
+                <li><Link to="/submit" className="hover:text-primary">Submit Project</Link></li>
                 <li><a href="#" className="hover:text-primary">Community</a></li>
               </ul>
             </div>
