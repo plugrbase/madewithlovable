@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Star, StarOff, Trash2, Eye, Check, Edit } from "lucide-react";
 import { Project } from "@/types/admin";
 import { format } from "date-fns";
@@ -24,7 +25,8 @@ const ProjectList = ({
 }: ProjectListProps) => {
   return (
     <div className="rounded-md border">
-      <div className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4 p-4 font-medium">
+      <div className="grid grid-cols-[auto,1fr,1fr,1fr,auto] gap-4 p-4 font-medium">
+        <div></div>
         <div>Title</div>
         <div>Author</div>
         <div>Created</div>
@@ -33,8 +35,12 @@ const ProjectList = ({
       {projects.map((project) => (
         <div
           key={project.id}
-          className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4 border-t p-4"
+          className="grid grid-cols-[auto,1fr,1fr,1fr,auto] gap-4 border-t p-4 items-center"
         >
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={project.image_url || ''} alt={project.title} className="object-cover" />
+            <AvatarFallback>IMG</AvatarFallback>
+          </Avatar>
           <div className="flex items-center gap-2">
             {project.title}
             {project.validated && (
