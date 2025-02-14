@@ -44,7 +44,11 @@ const Admin = () => {
     try {
       const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
-        .select('*, profiles(username)')
+        .select(`
+          *,
+          profiles(username),
+          created_at
+        `)
         .order('created_at', { ascending: false });
 
       if (projectsError) throw projectsError;
@@ -52,7 +56,13 @@ const Admin = () => {
 
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id,
+          username,
+          role,
+          created_at,
+          is_disabled
+        `)
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
