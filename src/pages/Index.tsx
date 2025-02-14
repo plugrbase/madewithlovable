@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ProjectCard from '@/components/ProjectCard';
 import FeaturedProject from '@/components/FeaturedProject';
 import NewsletterForm from '@/components/NewsletterForm';
-import { Search, Filter, LogIn } from 'lucide-react';
+import { Search, Filter, LogIn, Plus } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -32,6 +32,21 @@ const fetchFeaturedProject = async () => {
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -55,13 +70,22 @@ const Index = () => {
     <div className="min-h-screen bg-secondary">
       {/* Hero Section */}
       <section className="py-20 px-4 text-center animate-fadeIn">
-        <div className="flex justify-end container mb-4">
-          <Button asChild variant="outline">
-            <Link to="/auth">
-              <LogIn className="mr-2 h-4 w-4" />
-              Sign In
-            </Link>
-          </Button>
+        <div className="flex justify-end container mb-4 gap-4">
+          {isAuthenticated ? (
+            <Button asChild>
+              <Link to="/submit">
+                <Plus className="mr-2 h-4 w-4" />
+                Submit Project
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline">
+              <Link to="/auth">
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Link>
+            </Button>
+          )}
         </div>
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Made with Lovable
