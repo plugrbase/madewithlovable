@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Twitter, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import ProjectCard from "@/components/ProjectCard";
+import NewsletterForm from "@/components/NewsletterForm";
 
 interface ProjectDetails {
   id: string;
@@ -17,6 +19,16 @@ interface ProjectDetails {
   profiles: {
     username: string | null;
   };
+}
+
+interface RelatedProject {
+  id: string;
+  title: string;
+  description: string;
+  short_description: string | null;
+  image_url: string | null;
+  tags: string[] | null;
+  views_count: number;
 }
 
 const ProjectPage = () => {
@@ -44,6 +56,51 @@ const ProjectPage = () => {
       if (error) throw error;
       return data as ProjectDetails;
     },
+  });
+
+  const { data: relatedProjects = [] } = useQuery({
+    queryKey: ['related-projects', id],
+    queryFn: async () => {
+      // First get the categories of the current project
+      const { data: projectCategories } = await supabase
+        .from('project_categories')
+        .select('category_id')
+        .eq('project_id', id);
+
+      if (!projectCategories?.length) {
+        // If no categories, just get random projects
+        const { data } = await supabase
+          .from('projects')
+          .select('id, title, description, short_description, image_url, tags, views_count')
+          .neq('id', id)
+          .eq('validated', true)
+          .limit(6)
+          .order('created_at', { ascending: false });
+        return data as RelatedProject[];
+      }
+
+      // Get projects that share categories
+      const categoryIds = projectCategories.map(pc => pc.category_id);
+      const { data: relatedProjectIds } = await supabase
+        .from('project_categories')
+        .select('project_id')
+        .in('category_id', categoryIds)
+        .neq('project_id', id);
+
+      if (!relatedProjectIds?.length) return [];
+
+      const uniqueProjectIds = [...new Set(relatedProjectIds.map(p => p.project_id))];
+      const { data } = await supabase
+        .from('projects')
+        .select('id, title, description, short_description, image_url, tags, views_count')
+        .in('id', uniqueProjectIds)
+        .eq('validated', true)
+        .limit(6)
+        .order('created_at', { ascending: false });
+
+      return data as RelatedProject[];
+    },
+    enabled: !!id,
   });
 
   if (isLoading) {
@@ -99,32 +156,57 @@ const ProjectPage = () => {
                       </a>
                     </Button>
                   )}
+                  {project.twitter_profile && (
+                    <Button asChild variant="outline">
+                      <a 
+                        href={`https://twitter.com/${project.twitter_profile}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Twitter className="h-4 w-4 mr-2" />
+                        @{project.twitter_profile}
+                      </a>
+                    </Button>
+                  )}
                 </div>
 
                 <p className="text-gray-600 whitespace-pre-wrap">{project.description}</p>
-
-                <div className="pt-4 border-t">
-                  <h2 className="text-sm text-gray-500 mb-2">Created by</h2>
-                  <div className="flex items-center gap-3">
-                    <span className="font-medium">{project.profiles.username || 'Anonymous'}</span>
-                    {project.twitter_profile && (
-                      <Button asChild variant="ghost" size="sm">
-                        <a 
-                          href={`https://twitter.com/${project.twitter_profile}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          <Twitter className="h-4 w-4 mr-2" />
-                          @{project.twitter_profile}
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {relatedProjects.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold mb-8">Related Projects</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={project.id}
+                  title={project.title}
+                  description={project.description}
+                  shortDescription={project.short_description}
+                  imageUrl={project.image_url || '/placeholder.svg'}
+                  tags={project.tags}
+                  views={project.views_count}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-12 text-center">
+          <Button asChild size="lg">
+            <Link to="/">
+              View All Projects
+            </Link>
+          </Button>
+        </div>
+
+        <div className="mt-24">
+          <NewsletterForm />
+        </div>
       </div>
     </div>
   );
