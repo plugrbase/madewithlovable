@@ -13,6 +13,8 @@ import CategoryList from "@/components/admin/CategoryList";
 import { useAdmin } from "@/hooks/use-admin";
 import { useProjectManagement } from "@/hooks/use-project-management";
 import { useUserManagement } from "@/hooks/use-user-management";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const {
@@ -28,6 +30,7 @@ const Admin = () => {
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const { toast } = useToast();
 
   const {
     handleImageUpload,
