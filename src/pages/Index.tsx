@@ -96,7 +96,7 @@ const Index = () => {
           </div>
           <div className="flex flex-col items-center justify-center mb-8">
             <img 
-              src="/lovable-uploads/2678d175-a9a7-4fe0-a822-5e29500a7c09.png"
+              src="/lovable-uploads/9102f3d4-a8bd-4d66-9ba7-bcd348cfeac2.png"
               alt="Made with Lovable Logo" 
               className="h-24 mb-6"
             />
