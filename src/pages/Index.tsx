@@ -94,12 +94,19 @@ const Index = () => {
             </Button>
           )}
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Made with Lovable
-        </h1>
-        <p className="text-xl text-gray-600 mb-8">
-          A collection of projects made with Lovable
-        </p>
+        <div className="flex flex-col items-center justify-center mb-8">
+          <img 
+            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+            alt="Made with Lovable Logo" 
+            className="w-32 h-32 object-cover rounded-xl mb-6"
+          />
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Made with Lovable
+          </h1>
+          <p className="text-xl text-gray-600">
+            A collection of projects made with Lovable
+          </p>
+        </div>
         <div className="max-w-2xl mx-auto flex gap-4 mb-12">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
