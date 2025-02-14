@@ -37,8 +37,8 @@ const SubmitProject = () => {
           title: formData.title,
           description: formData.description,
           website_url: formData.websiteUrl,
-          github_url: formData.githubUrl,
-          twitter_profile: formData.twitterProfile,
+          github_url: formData.githubUrl || null,
+          twitter_profile: formData.twitterProfile || null,
           user_id: user.id,
         },
       ]);
@@ -122,7 +122,7 @@ const SubmitProject = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium" htmlFor="githubUrl">
-                  GitHub URL
+                  GitHub URL (optional)
                 </label>
                 <div className="relative">
                   <Github className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -130,7 +130,6 @@ const SubmitProject = () => {
                     id="githubUrl"
                     type="url"
                     className="pl-10"
-                    required
                     value={formData.githubUrl}
                     onChange={(e) =>
                       setFormData({ ...formData, githubUrl: e.target.value })
@@ -141,7 +140,7 @@ const SubmitProject = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium" htmlFor="twitterProfile">
-                  Twitter Profile
+                  Twitter Profile (optional)
                 </label>
                 <div className="relative">
                   <Twitter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -149,7 +148,6 @@ const SubmitProject = () => {
                     id="twitterProfile"
                     className="pl-10"
                     placeholder="@username"
-                    required
                     value={formData.twitterProfile}
                     onChange={(e) =>
                       setFormData({ ...formData, twitterProfile: e.target.value })
