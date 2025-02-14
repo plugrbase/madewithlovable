@@ -4,8 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Project } from "@/types/admin";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface ProjectEditDialogProps {
   project: Project | null;
@@ -17,21 +24,68 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
   const [editingProject, setEditingProject] = useState<Project | null>(project);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  // Reset the editing state when a new project is selected
   useEffect(() => {
     setEditingProject(project);
     setImageFile(null);
     setUploadingImage(false);
+    if (project) {
+      fetchCategories();
+      fetchProjectCategories(project.id);
+    }
   }, [project]);
+
+  const fetchCategories = async () => {
+    const { data } = await supabase.from('categories').select('*').order('name');
+    if (data) setCategories(data);
+  };
+
+  const fetchProjectCategories = async (projectId: string) => {
+    const { data } = await supabase
+      .from('project_categories')
+      .select('category_id')
+      .eq('project_id', projectId);
+    
+    if (data) {
+      setSelectedCategories(data.map(pc => pc.category_id));
+    }
+  };
 
   if (!editingProject) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploadingImage(true);
-    await onSave(editingProject, imageFile);
-    setUploadingImage(false);
+
+    try {
+      // First save the project
+      await onSave(editingProject, imageFile);
+
+      // Then update the project categories
+      if (project) {
+        // Delete existing categories
+        await supabase
+          .from('project_categories')
+          .delete()
+          .eq('project_id', project.id);
+
+        // Insert new categories
+        if (selectedCategories.length > 0) {
+          await supabase
+            .from('project_categories')
+            .insert(
+              selectedCategories.map(categoryId => ({
+                project_id: project.id,
+                category_id: categoryId,
+              }))
+            );
+        }
+      }
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   return (
@@ -59,6 +113,33 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
               onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Categories</Label>
+            <div className="grid grid-cols-2 gap-4">
+              {categories.map((category) => (
+                <div key={category.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`category-${category.id}`}
+                    checked={selectedCategories.includes(category.id)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedCategories([...selectedCategories, category.id]);
+                      } else {
+                        setSelectedCategories(selectedCategories.filter(id => id !== category.id));
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor={`category-${category.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {category.name}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">

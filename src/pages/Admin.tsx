@@ -10,11 +10,13 @@ import ProjectList from "@/components/admin/ProjectList";
 import ProjectViewDialog from "@/components/admin/ProjectViewDialog";
 import ProjectEditDialog from "@/components/admin/ProjectEditDialog";
 import UserList from "@/components/admin/UserList";
+import CategoryList from "@/components/admin/CategoryList";
 
 const Admin = () => {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -67,6 +69,14 @@ const Admin = () => {
 
       if (usersError) throw usersError;
       setUsers(usersData);
+
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (categoriesError) throw categoriesError;
+      setCategories(categoriesData);
     } catch (error: any) {
       toast({
         title: "Error fetching data",
@@ -312,6 +322,7 @@ const Admin = () => {
               <TabsList>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="categories">Categories</TabsTrigger>
               </TabsList>
 
               <TabsContent value="projects" className="mt-6">
@@ -330,6 +341,13 @@ const Admin = () => {
                   users={users}
                   onToggleRole={toggleUserRole}
                   onToggleDisable={toggleUserDisable}
+                />
+              </TabsContent>
+
+              <TabsContent value="categories" className="mt-6">
+                <CategoryList
+                  categories={categories}
+                  onCategoryChange={fetchData}
                 />
               </TabsContent>
             </Tabs>
