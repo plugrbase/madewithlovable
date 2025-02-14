@@ -75,7 +75,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <section className="pt-6 pb-20 px-4 text-center animate-fadeIn">
+      <section className="pt-6 pb-8 px-4 text-center animate-fadeIn">
         <div className="container">
           <div className="flex justify-end mb-8">
             {isAuthenticated ? (
@@ -107,7 +107,7 @@ const Index = () => {
               A collection of projects made with Lovable
             </p>
           </div>
-          <div className="max-w-2xl mx-auto flex gap-4 mb-12">
+          <div className="max-w-2xl mx-auto flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input 
