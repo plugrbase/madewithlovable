@@ -32,6 +32,23 @@ const SubmitProject = () => {
 
       if (!user) throw new Error("Not authenticated");
 
+      // First ensure the user has a profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', user.id)
+        .single();
+
+      if (!profile) {
+        // Create profile if it doesn't exist
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{ id: user.id }]);
+
+        if (profileError) throw profileError;
+      }
+
+      // Now insert the project
       const { error } = await supabase.from("projects").insert([
         {
           title: formData.title,
