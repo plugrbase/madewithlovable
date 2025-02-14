@@ -20,13 +20,22 @@ const NewsletterForm = () => {
         .from('newsletter_subscribers')
         .insert([{ email }]);
 
-      if (error) throw error;
-
-      toast({
-        title: "Successfully subscribed!",
-        description: "Thank you for subscribing to our newsletter.",
-      });
-      setEmail("");
+      if (error) {
+        if (error.code === '23505') { // PostgreSQL unique violation error code
+          toast({
+            title: "Already subscribed",
+            description: "This email is already subscribed to our newsletter.",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Successfully subscribed!",
+          description: "Thank you for subscribing to our newsletter.",
+        });
+        setEmail("");
+      }
     } catch (error: any) {
       toast({
         title: "Error",
