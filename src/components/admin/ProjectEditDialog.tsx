@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Project } from "@/types/admin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ProjectEditDialogProps {
   project: Project | null;
@@ -17,6 +17,13 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
   const [editingProject, setEditingProject] = useState<Project | null>(project);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Reset the editing state when a new project is selected
+  useEffect(() => {
+    setEditingProject(project);
+    setImageFile(null);
+    setUploadingImage(false);
+  }, [project]);
 
   if (!editingProject) return null;
 
