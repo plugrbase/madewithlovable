@@ -3,8 +3,6 @@ project_id = "awbqsxvxuqwzwmufpyvs"
 
 [api]
 enabled = true
-url = "https://awbqsxvxuqwzwmufpyvs.supabase.co"
-service_role_key = "eyJh..."
 
 [functions.send-confirmation-email]
 verify_jwt = true
