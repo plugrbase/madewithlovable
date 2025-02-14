@@ -11,10 +11,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 const fetchProjects = async () => {
+  const now = new Date().toISOString();
   const { data, error } = await supabase
     .from('projects')
     .select('*')
     .eq('validated', true)
+    .or(`publish_date.lte.${now},publish_date.is.null`)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -22,11 +24,13 @@ const fetchProjects = async () => {
 };
 
 const fetchFeaturedProject = async () => {
+  const now = new Date().toISOString();
   const { data, error } = await supabase
     .from('projects')
     .select('*')
     .eq('is_featured', true)
     .eq('validated', true)
+    .or(`publish_date.lte.${now},publish_date.is.null`)
     .maybeSingle();
 
   if (error) throw error;

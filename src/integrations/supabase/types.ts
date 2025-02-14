@@ -119,6 +119,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_featured: boolean | null
+          publish_date: string | null
           tags: string[] | null
           title: string
           twitter_profile: string | null
@@ -135,6 +136,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
+          publish_date?: string | null
           tags?: string[] | null
           title: string
           twitter_profile?: string | null
@@ -151,6 +153,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
+          publish_date?: string | null
           tags?: string[] | null
           title?: string
           twitter_profile?: string | null
