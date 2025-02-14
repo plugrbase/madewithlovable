@@ -1,194 +1,176 @@
 
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Github, Globe, Twitter } from "lucide-react";
 
 const SubmitProject = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [twitterProfile, setTwitterProfile] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    websiteUrl: "",
-    githubUrl: "",
-    twitterProfile: "",
-  });
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
-
-      // First ensure the user has a profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', user.id)
-        .single();
-
-      if (!profile) {
-        // Create profile if it doesn't exist
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ id: user.id }]);
-
-        if (profileError) throw profileError;
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to submit a project",
+          variant: "destructive",
+        });
+        return;
       }
 
-      // Now insert the project
-      const { error } = await supabase.from("projects").insert([
-        {
-          title: formData.title,
-          description: formData.description,
-          website_url: formData.websiteUrl,
-          github_url: formData.githubUrl || null,
-          twitter_profile: formData.twitterProfile || null,
-          user_id: user.id,
-        },
-      ]);
+      let imageUrl = null;
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('project-images')
+          .upload(filePath, imageFile);
 
-      if (error) throw error;
+        if (uploadError) {
+          throw new Error('Failed to upload image');
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('project-images')
+          .getPublicUrl(filePath);
+        
+        imageUrl = publicUrl;
+      }
+
+      const { data: project, error: insertError } = await supabase
+        .from('projects')
+        .insert([
+          {
+            title,
+            description,
+            website_url: websiteUrl,
+            github_url: githubUrl,
+            twitter_profile: twitterProfile,
+            image_url: imageUrl,
+            user_id: user.id,
+            status: 'pending',
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Send confirmation email
+      const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
+        body: { email: user.email, projectTitle: title },
+      });
+
+      if (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+      }
 
       toast({
         title: "Success!",
-        description: "Your project has been submitted successfully.",
+        description: "Your project has been submitted and is pending review. We'll notify you once it's approved.",
       });
-      navigate("/");
-    } catch (error: any) {
+
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting project:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to submit project. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-secondary py-12 px-4">
-      <div className="container max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Submit Your Project</CardTitle>
-            <CardDescription>
-              Share your Lovable project with the community
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="title">
-                  Project Title
-                </label>
-                <Input
-                  id="title"
-                  required
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                />
-              </div>
+    <div className="container max-w-2xl py-8">
+      <h1 className="text-3xl font-bold mb-8">Submit Your Project</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">Project Title</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="description">
-                  Description
-                </label>
-                <Textarea
-                  id="description"
-                  required
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                />
-              </div>
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="websiteUrl">
-                  URL
-                </label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                  <Input
-                    id="websiteUrl"
-                    type="url"
-                    className="pl-10"
-                    required
-                    value={formData.websiteUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, websiteUrl: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
+        <div className="space-y-2">
+          <Label htmlFor="image">Project Image</Label>
+          <Input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          />
+        </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="githubUrl">
-                  GitHub URL (optional)
-                </label>
-                <div className="relative">
-                  <Github className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                  <Input
-                    id="githubUrl"
-                    type="url"
-                    className="pl-10"
-                    value={formData.githubUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, githubUrl: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
+        <div className="space-y-2">
+          <Label htmlFor="website">Website URL</Label>
+          <Input
+            id="website"
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://"
+          />
+        </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="twitterProfile">
-                  Twitter Profile (optional)
-                </label>
-                <div className="relative">
-                  <Twitter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                  <Input
-                    id="twitterProfile"
-                    className="pl-10"
-                    placeholder="@username"
-                    value={formData.twitterProfile}
-                    onChange={(e) =>
-                      setFormData({ ...formData, twitterProfile: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
+        <div className="space-y-2">
+          <Label htmlFor="github">GitHub URL</Label>
+          <Input
+            id="github"
+            type="url"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/"
+          />
+        </div>
 
-              <div className="flex justify-end space-x-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate("/")}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Submitting..." : "Submit Project"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+        <div className="space-y-2">
+          <Label htmlFor="twitter">Twitter Profile</Label>
+          <Input
+            id="twitter"
+            value={twitterProfile}
+            onChange={(e) => setTwitterProfile(e.target.value)}
+            placeholder="@username"
+          />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit Project"}
+        </Button>
+      </form>
     </div>
   );
 };
