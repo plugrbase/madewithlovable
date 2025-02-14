@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthConfirmation from "./pages/AuthConfirmation";
 import SubmitProject from "./pages/SubmitProject";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -57,6 +58,14 @@ const App = () => (
             element={
               <PrivateRoute>
                 <SubmitProject />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                <Admin />
               </PrivateRoute>
             }
           />
