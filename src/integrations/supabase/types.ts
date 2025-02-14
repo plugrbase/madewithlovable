@@ -70,6 +70,7 @@ export type Database = {
           twitter_profile: string | null
           updated_at: string
           user_id: string
+          validated: boolean | null
           views_count: number | null
           website_url: string | null
         }
@@ -85,6 +86,7 @@ export type Database = {
           twitter_profile?: string | null
           updated_at?: string
           user_id: string
+          validated?: boolean | null
           views_count?: number | null
           website_url?: string | null
         }
@@ -100,6 +102,7 @@ export type Database = {
           twitter_profile?: string | null
           updated_at?: string
           user_id?: string
+          validated?: boolean | null
           views_count?: number | null
           website_url?: string | null
         }

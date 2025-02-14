@@ -4,15 +4,33 @@ import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, Star, StarOff, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Star, StarOff, Trash2, Eye, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  website_url: string | null;
+  github_url: string | null;
+  twitter_profile: string | null;
+  tags: string[] | null;
+  is_featured: boolean;
+  validated: boolean;
+  views_count: number;
+  profiles: { username: string | null };
+}
 
 const Admin = () => {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,6 +101,34 @@ const Admin = () => {
       toast({
         title: "Success",
         description: `Project ${currentStatus ? 'unfeatured' : 'featured'} successfully`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleValidation = async (projectId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ validated: !currentStatus })
+        .eq('id', projectId);
+
+      if (error) throw error;
+
+      setProjects(projects.map(project => 
+        project.id === projectId 
+          ? { ...project, validated: !currentStatus }
+          : project
+      ));
+
+      toast({
+        title: "Success",
+        description: `Project ${currentStatus ? 'unvalidated' : 'validated'} successfully`,
       });
     } catch (error: any) {
       toast({
@@ -187,9 +233,30 @@ const Admin = () => {
                       key={project.id}
                       className="grid grid-cols-[1fr,1fr,auto] gap-4 border-t p-4"
                     >
-                      <div>{project.title}</div>
+                      <div className="flex items-center gap-2">
+                        {project.title}
+                        {project.validated && (
+                          <Badge variant="secondary" className="text-xs">
+                            Validated
+                          </Badge>
+                        )}
+                      </div>
                       <div>{project.profiles?.username || 'Anonymous'}</div>
                       <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedProject(project)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleValidation(project.id, project.validated)}
+                        >
+                          <Check className={`h-4 w-4 ${project.validated ? 'text-green-500' : ''}`} />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -245,6 +312,112 @@ const Admin = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
+        {selectedProject && (
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>{selectedProject.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {selectedProject.image_url && (
+                <div className="relative aspect-video">
+                  <img 
+                    src={selectedProject.image_url} 
+                    alt={selectedProject.title}
+                    className="rounded-lg object-cover w-full h-full"
+                  />
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <h3 className="font-semibold">Description</h3>
+                <p className="text-gray-600">{selectedProject.description}</p>
+              </div>
+
+              {selectedProject.tags && selectedProject.tags.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Tags</h3>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedProject.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Links</h3>
+                <div className="space-y-1">
+                  {selectedProject.website_url && (
+                    <p>
+                      <span className="font-medium">Website:</span>{" "}
+                      <a 
+                        href={selectedProject.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {selectedProject.website_url}
+                      </a>
+                    </p>
+                  )}
+                  {selectedProject.github_url && (
+                    <p>
+                      <span className="font-medium">GitHub:</span>{" "}
+                      <a 
+                        href={selectedProject.github_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {selectedProject.github_url}
+                      </a>
+                    </p>
+                  )}
+                  {selectedProject.twitter_profile && (
+                    <p>
+                      <span className="font-medium">Twitter:</span>{" "}
+                      <a 
+                        href={`https://twitter.com/${selectedProject.twitter_profile}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        @{selectedProject.twitter_profile}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Stats</h3>
+                <p>Views: {selectedProject.views_count}</p>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedProject(null)}
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    toggleValidation(selectedProject.id, selectedProject.validated);
+                    setSelectedProject(null);
+                  }}
+                >
+                  {selectedProject.validated ? 'Unvalidate' : 'Validate'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 };
