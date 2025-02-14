@@ -14,6 +14,7 @@ const fetchProjects = async () => {
   const { data, error } = await supabase
     .from('projects')
     .select('*')
+    .eq('validated', true)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -25,6 +26,7 @@ const fetchFeaturedProject = async () => {
     .from('projects')
     .select('*')
     .eq('is_featured', true)
+    .eq('validated', true)
     .maybeSingle();
 
   if (error) throw error;
