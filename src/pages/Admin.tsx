@@ -1,14 +1,16 @@
-
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Star, StarOff, Trash2, Eye, Check } from "lucide-react";
+import { Loader2, Star, StarOff, Trash2, Eye, Check, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Project {
   id: string;
@@ -31,6 +33,9 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -55,7 +60,6 @@ const Admin = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch projects
       const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
         .select('*, profiles(username)')
@@ -64,7 +68,6 @@ const Admin = () => {
       if (projectsError) throw projectsError;
       setProjects(projectsData);
 
-      // Fetch users
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
         .select('*')
@@ -195,6 +198,79 @@ const Admin = () => {
     }
   };
 
+  const handleImageUpload = async (file: File, projectId: string): Promise<string | null> => {
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${projectId}.${fileExt}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('project-images')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('project-images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "Error uploading image",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const updateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+
+    try {
+      let imageUrl = editingProject.image_url;
+
+      if (imageFile) {
+        setUploadingImage(true);
+        imageUrl = await handleImageUpload(imageFile, editingProject.id);
+        setUploadingImage(false);
+      }
+
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          title: editingProject.title,
+          description: editingProject.description,
+          website_url: editingProject.website_url,
+          github_url: editingProject.github_url,
+          twitter_profile: editingProject.twitter_profile,
+          image_url: imageUrl,
+        })
+        .eq('id', editingProject.id);
+
+      if (error) throw error;
+
+      setProjects(projects.map(project =>
+        project.id === editingProject.id
+          ? { ...editingProject, image_url: imageUrl }
+          : project
+      ));
+
+      setEditingProject(null);
+      toast({
+        title: "Success",
+        description: "Project updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isAdmin === null || loading) {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center">
@@ -249,6 +325,13 @@ const Admin = () => {
                           onClick={() => setSelectedProject(project)}
                         >
                           <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEditingProject(project)}
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -415,6 +498,99 @@ const Admin = () => {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      <Dialog open={!!editingProject} onOpenChange={() => setEditingProject(null)}>
+        {editingProject && (
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Edit Project: {editingProject.title}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={updateProject} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={editingProject.title}
+                  onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={editingProject.description}
+                  onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image">Project Image</Label>
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                />
+                {editingProject.image_url && (
+                  <div className="mt-2">
+                    <img
+                      src={editingProject.image_url}
+                      alt="Current project image"
+                      className="max-h-32 rounded-md"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="website">Website URL</Label>
+                <Input
+                  id="website"
+                  type="url"
+                  value={editingProject.website_url || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, website_url: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="github">GitHub URL</Label>
+                <Input
+                  id="github"
+                  type="url"
+                  value={editingProject.github_url || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, github_url: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="twitter">Twitter Profile</Label>
+                <Input
+                  id="twitter"
+                  value={editingProject.twitter_profile || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, twitter_profile: e.target.value })}
+                  placeholder="@username"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingProject(null)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={uploadingImage}>
+                  {uploadingImage ? "Uploading..." : "Save Changes"}
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         )}
       </Dialog>
