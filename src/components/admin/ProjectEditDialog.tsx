@@ -59,6 +59,16 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
     e.preventDefault();
     setUploadingImage(true);
 
+    // If there's an existing image, delete it first
+    if (imageFile && editingProject.image_url) {
+      const oldImagePath = editingProject.image_url.split('/').pop();
+      if (oldImagePath) {
+        await supabase.storage
+          .from('project-images')
+          .remove([oldImagePath]);
+      }
+    }
+
     try {
       // First save the project
       await onSave(editingProject, imageFile);
