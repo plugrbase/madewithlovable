@@ -110,16 +110,6 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={editingProject.description}
-              onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="shortDescription">Short Description (for thumbnails)</Label>
             <Textarea
               id="shortDescription"
@@ -131,6 +121,16 @@ const ProjectEditDialog = ({ project, onClose, onSave }: ProjectEditDialogProps)
             <p className="text-sm text-gray-500">
               {((editingProject.short_description?.length || 0) + '/150')} characters
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Full Description</Label>
+            <Textarea
+              id="description"
+              value={editingProject.description}
+              onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+              required
+            />
           </div>
 
           <div className="space-y-2">
