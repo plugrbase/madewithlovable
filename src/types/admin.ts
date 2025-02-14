@@ -11,5 +11,6 @@ export interface Project {
   is_featured: boolean;
   validated: boolean;
   views_count: number;
+  created_at: string;
   profiles: { username: string | null };
 }

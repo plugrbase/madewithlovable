@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -207,6 +206,36 @@ const Admin = () => {
     }
   };
 
+  const toggleUserDisable = async (userId: string, currentStatus: boolean) => {
+    if (!window.confirm(`Are you sure you want to ${currentStatus ? 'enable' : 'disable'} this user?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_disabled: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(users.map(user => 
+        user.id === userId 
+          ? { ...user, is_disabled: !currentStatus }
+          : user
+      ));
+
+      toast({
+        title: "Success",
+        description: `User ${currentStatus ? 'enabled' : 'disabled'} successfully`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleUpdateProject = async (updatedProject: Project, imageFile: File | null) => {
     try {
       let imageUrl = updatedProject.image_url;
@@ -290,6 +319,7 @@ const Admin = () => {
                 <UserList
                   users={users}
                   onToggleRole={toggleUserRole}
+                  onToggleDisable={toggleUserDisable}
                 />
               </TabsContent>
             </Tabs>

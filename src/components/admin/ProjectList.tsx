@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, StarOff, Trash2, Eye, Check, Edit } from "lucide-react";
 import { Project } from "@/types/admin";
+import { format } from "date-fns";
 
 interface ProjectListProps {
   projects: Project[];
@@ -23,15 +24,16 @@ const ProjectList = ({
 }: ProjectListProps) => {
   return (
     <div className="rounded-md border">
-      <div className="grid grid-cols-[1fr,1fr,auto] gap-4 p-4 font-medium">
+      <div className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4 p-4 font-medium">
         <div>Title</div>
         <div>Author</div>
+        <div>Created</div>
         <div>Actions</div>
       </div>
       {projects.map((project) => (
         <div
           key={project.id}
-          className="grid grid-cols-[1fr,1fr,auto] gap-4 border-t p-4"
+          className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4 border-t p-4"
         >
           <div className="flex items-center gap-2">
             {project.title}
@@ -42,6 +44,7 @@ const ProjectList = ({
             )}
           </div>
           <div>{project.profiles?.username || 'Anonymous'}</div>
+          <div>{format(new Date(project.created_at), 'MMM d, yyyy')}</div>
           <div className="flex gap-2">
             <Button
               variant="ghost"
