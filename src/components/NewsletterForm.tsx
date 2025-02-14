@@ -4,18 +4,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const NewsletterForm = () => {
   const { toast } = useToast();
   const [email, setEmail] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Successfully subscribed!",
-      description: "Thank you for subscribing to our newsletter.",
-    });
-    setEmail("");
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Successfully subscribed!",
+        description: "Thank you for subscribing to our newsletter.",
+      });
+      setEmail("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,8 +51,11 @@ const NewsletterForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="flex-1"
+            required
           />
-          <Button type="submit">Subscribe</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Subscribing..." : "Subscribe"}
+          </Button>
         </form>
       </CardContent>
     </Card>

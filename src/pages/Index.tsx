@@ -5,52 +5,65 @@ import { Button } from "@/components/ui/button";
 import ProjectCard from '@/components/ProjectCard';
 import FeaturedProject from '@/components/FeaturedProject';
 import NewsletterForm from '@/components/NewsletterForm';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, LogIn } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
-const MOCK_FEATURED_PROJECT = {
-  title: "AI-Powered Task Manager",
-  description: "A sophisticated task management application built with Lovable, featuring AI-powered task organization and natural language processing.",
-  imageUrl: "/placeholder.svg",
-  tags: ["AI", "Productivity", "SaaS"],
-  link: "#"
+const fetchProjects = async () => {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
 };
 
-const MOCK_PROJECTS = [
-  {
-    title: "E-commerce Template",
-    description: "A modern e-commerce template with cart functionality and payment integration.",
-    imageUrl: "/placeholder.svg",
-    tags: ["E-commerce", "Template"],
-    views: 1234
-  },
-  {
-    title: "Blog Platform",
-    description: "A full-featured blog platform with markdown support and SEO optimization.",
-    imageUrl: "/placeholder.svg",
-    tags: ["CMS", "Blog"],
-    views: 856
-  },
-  {
-    title: "Authentication Plugin",
-    description: "Easy-to-integrate authentication plugin with social login support.",
-    imageUrl: "/placeholder.svg",
-    tags: ["Plugin", "Auth"],
-    views: 2341
-  },
-  {
-    title: "Dashboard UI Kit",
-    description: "Modern dashboard components with dark mode and responsive design.",
-    imageUrl: "/placeholder.svg",
-    tags: ["UI Kit", "Dashboard"],
-    views: 1567
-  },
-];
+const fetchFeaturedProject = async () => {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('is_featured', true)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+};
 
 const Index = () => {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: fetchProjects,
+  });
+
+  const { data: featuredProject } = useQuery({
+    queryKey: ['featuredProject'],
+    queryFn: fetchFeaturedProject,
+  });
+
+  const filteredProjects = projects.filter(project =>
+    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.tags.some((tag: string) => 
+      tag.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
   return (
     <div className="min-h-screen bg-secondary">
       {/* Hero Section */}
       <section className="py-20 px-4 text-center animate-fadeIn">
+        <div className="flex justify-end container mb-4">
+          <Button asChild variant="outline">
+            <Link to="/auth">
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In
+            </Link>
+          </Button>
+        </div>
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Made with Lovable
         </h1>
@@ -60,7 +73,12 @@ const Index = () => {
         <div className="max-w-2xl mx-auto flex gap-4 mb-12">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input className="pl-10" placeholder="Search projects..." />
+            <Input 
+              className="pl-10" 
+              placeholder="Search projects..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
           <Button variant="outline">
             <Filter className="mr-2 h-4 w-4" />
@@ -70,17 +88,32 @@ const Index = () => {
       </section>
 
       {/* Featured Project */}
-      <section className="container mb-20">
-        <h2 className="text-2xl font-semibold mb-6">Featured Project</h2>
-        <FeaturedProject {...MOCK_FEATURED_PROJECT} />
-      </section>
+      {featuredProject && (
+        <section className="container mb-20">
+          <h2 className="text-2xl font-semibold mb-6">Featured Project</h2>
+          <FeaturedProject 
+            title={featuredProject.title}
+            description={featuredProject.description}
+            imageUrl={featuredProject.image_url || "/placeholder.svg"}
+            tags={featuredProject.tags}
+            link={featuredProject.website_url || "#"}
+          />
+        </section>
+      )}
 
       {/* Projects Grid */}
       <section className="container mb-20">
         <h2 className="text-2xl font-semibold mb-6">Latest Projects</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {MOCK_PROJECTS.map((project, index) => (
-            <ProjectCard key={index} {...project} />
+          {filteredProjects.map((project) => (
+            <ProjectCard 
+              key={project.id}
+              title={project.title}
+              description={project.description}
+              imageUrl={project.image_url || "/placeholder.svg"}
+              tags={project.tags}
+              views={project.views_count}
+            />
           ))}
         </div>
       </section>

@@ -9,7 +9,104 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string
+          github_url: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          views_count: number | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views_count?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views_count?: number | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
