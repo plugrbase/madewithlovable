@@ -120,11 +120,12 @@ export type Database = {
           image_url: string | null
           is_featured: boolean | null
           publish_date: string | null
+          status: string
           tags: string[] | null
           title: string
           twitter_profile: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           validated: boolean | null
           views_count: number | null
           website_url: string | null
@@ -137,11 +138,12 @@ export type Database = {
           image_url?: string | null
           is_featured?: boolean | null
           publish_date?: string | null
+          status?: string
           tags?: string[] | null
           title: string
           twitter_profile?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           validated?: boolean | null
           views_count?: number | null
           website_url?: string | null
@@ -154,11 +156,12 @@ export type Database = {
           image_url?: string | null
           is_featured?: boolean | null
           publish_date?: string | null
+          status?: string
           tags?: string[] | null
           title?: string
           twitter_profile?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           validated?: boolean | null
           views_count?: number | null
           website_url?: string | null

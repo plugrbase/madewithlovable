@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 const SubmitProject = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [twitterProfile, setTwitterProfile] = useState("");
@@ -24,17 +25,6 @@ const SubmitProject = () => {
     setIsSubmitting(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to submit a project",
-          variant: "destructive",
-        });
-        return;
-      }
-
       let imageUrl = null;
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop();
@@ -65,7 +55,6 @@ const SubmitProject = () => {
             github_url: githubUrl,
             twitter_profile: twitterProfile,
             image_url: imageUrl,
-            user_id: user.id,
             status: 'pending',
           },
         ])
@@ -76,7 +65,7 @@ const SubmitProject = () => {
 
       // Send confirmation email
       const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
-        body: { email: user.email, projectTitle: title },
+        body: { email, projectTitle: title },
       });
 
       if (emailError) {
@@ -111,6 +100,18 @@ const SubmitProject = () => {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
             required
           />
         </div>
