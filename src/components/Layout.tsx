@@ -45,7 +45,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen relative">
       {isLoggedIn && (
-        <div className="absolute top-4 right-4 z-50">
+        <div className="absolute top-4 right-[calc(2rem+3rem)] z-50">
           <Button
             variant="outline"
             size="default"
