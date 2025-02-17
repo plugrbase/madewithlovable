@@ -9,7 +9,7 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">About</h3>
             <p className="text-sm text-gray-600">
-              Made with Lovable showcases the best projects built using the Lovable framework.
+              Made with Lovable showcases the best projects built using Lovable.
             </p>
           </div>
           <div>
