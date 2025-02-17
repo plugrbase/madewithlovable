@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Twitter, Mail, Chrome } from "lucide-react";
@@ -15,7 +15,19 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Handle the OAuth callback
+    if (location.pathname === '/auth/callback') {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/');
+        }
+      });
+    }
+  }, [location, navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +79,18 @@ const Auth = () => {
       });
     }
   };
+
+  // If we're on the callback route, show a loading state
+  if (location.pathname === '/auth/callback') {
+    return (
+      <div className="min-h-screen bg-secondary flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Completing sign in...</h2>
+          <p className="text-gray-600">Please wait while we authenticate you.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
