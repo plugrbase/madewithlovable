@@ -23,7 +23,7 @@ const Auth = () => {
     if (location.pathname === '/auth/callback') {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          navigate('/submit');
+          navigate('/my-projects');
         }
       });
     }
@@ -49,7 +49,7 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/submit");
+        navigate("/my-projects");
       }
     } catch (error: any) {
       toast({

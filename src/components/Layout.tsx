@@ -1,5 +1,5 @@
 
-import { LogOut } from "lucide-react";
+import { LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,10 +42,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const handleLogin = () => {
+    navigate('/auth');
+  };
+
   return (
     <div className="min-h-screen relative">
-      {isLoggedIn && (
-        <div className="absolute top-4 right-[calc(2rem+3rem)] z-50">
+      <div className="absolute top-4 right-[calc(2rem+3rem)] z-50">
+        {isLoggedIn ? (
           <Button
             variant="outline"
             size="default"
@@ -54,8 +58,17 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           >
             <LogOut className="h-5 w-5" />
           </Button>
-        </div>
-      )}
+        ) : (
+          <Button
+            variant="outline"
+            size="default"
+            onClick={handleLogin}
+            className="border-gray-200"
+          >
+            <LogIn className="h-5 w-5" />
+          </Button>
+        )}
+      </div>
       {children}
     </div>
   );

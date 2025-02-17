@@ -15,6 +15,7 @@ import ProjectSubmitted from "./pages/ProjectSubmitted";
 import Admin from "./pages/Admin";
 import Project from "./pages/Project";
 import NotFound from "./pages/NotFound";
+import MyProjects from "./pages/MyProjects";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<boolean | null>(null);
@@ -60,6 +61,14 @@ const App = () => (
             <Route path="/auth/callback" element={<Auth />} />
             <Route path="/auth/confirmation" element={<AuthConfirmation />} />
             <Route path="/project-submitted" element={<ProjectSubmitted />} />
+            <Route
+              path="/my-projects"
+              element={
+                <PrivateRoute>
+                  <MyProjects />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/submit"
               element={
