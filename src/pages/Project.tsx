@@ -221,17 +221,13 @@ const ProjectPage = () => {
             <div>
               <h3 className="font-semibold mb-4">Resources</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-primary">Documentation</a></li>
                 <li><Link to="/submit" className="hover:text-primary">Submit Project</Link></li>
-                <li><a href="#" className="hover:text-primary">Community</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Connect</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-primary">Twitter</a></li>
-                <li><a href="#" className="hover:text-primary">GitHub</a></li>
-                <li><a href="#" className="hover:text-primary">Discord</a></li>
+                <li><a href="https://x.com/JulienLeg78" className="hover:text-primary">Twitter</a></li>
               </ul>
             </div>
           </div>
