@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 const SubmitProject = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [twitterProfile, setTwitterProfile] = useState("");
@@ -58,6 +59,7 @@ const SubmitProject = () => {
           {
             title,
             description,
+            email,
             website_url: websiteUrl,
             github_url: githubUrl,
             twitter_profile: twitterProfile,
@@ -93,6 +95,18 @@ const SubmitProject = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="your@email.com"
           />
         </div>
 
