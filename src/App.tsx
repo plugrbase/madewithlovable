@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthConfirmation from "./pages/AuthConfirmation";
 import SubmitProject from "./pages/SubmitProject";
+import ProjectSubmitted from "./pages/ProjectSubmitted";
 import Admin from "./pages/Admin";
 import Project from "./pages/Project";
 import NotFound from "./pages/NotFound";
@@ -54,8 +55,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/project/:id" element={<Project />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/auth/callback" element={<Auth />} /> {/* Add this line for OAuth callback */}
+          <Route path="/auth/callback" element={<Auth />} />
           <Route path="/auth/confirmation" element={<AuthConfirmation />} />
+          <Route path="/project-submitted" element={<ProjectSubmitted />} />
           <Route
             path="/submit"
             element={

@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const SubmitProject = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [email, setEmail] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [twitterProfile, setTwitterProfile] = useState("");
@@ -20,11 +19,24 @@ const SubmitProject = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Check if user is authenticated
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/auth');
+      }
+    });
+  }, [navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // Get current user
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) throw new Error('You must be logged in to submit a project');
+
       let imageUrl = null;
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop();
@@ -45,7 +57,7 @@ const SubmitProject = () => {
         imageUrl = publicUrl;
       }
 
-      const { data: project, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('projects')
         .insert([
           {
@@ -56,33 +68,18 @@ const SubmitProject = () => {
             twitter_profile: twitterProfile,
             image_url: imageUrl,
             status: 'pending',
+            user_id: session.user.id
           },
-        ])
-        .select()
-        .single();
+        ]);
 
       if (insertError) throw insertError;
 
-      // Send confirmation email
-      const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
-        body: { email, projectTitle: title },
-      });
-
-      if (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
-      }
-
-      toast({
-        title: "Success!",
-        description: "Your project has been submitted and is pending review. We'll notify you once it's approved.",
-      });
-
-      navigate('/');
-    } catch (error) {
+      navigate('/project-submitted');
+    } catch (error: any) {
       console.error('Error submitting project:', error);
       toast({
         title: "Error",
-        description: "Failed to submit project. Please try again.",
+        description: error.message || "Failed to submit project. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -100,18 +97,6 @@ const SubmitProject = () => {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
             required
           />
         </div>
