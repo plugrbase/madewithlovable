@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -163,11 +164,11 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="container mb-20">
-        <div className="max-w-xl mx-auto">
+      <div className="w-full bg-primary/5 py-20">
+        <div className="container max-w-4xl">
           <NewsletterForm />
         </div>
-      </section>
+      </div>
 
       <footer className="bg-white py-12">
         <div className="container">

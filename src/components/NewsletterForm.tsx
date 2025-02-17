@@ -48,26 +48,25 @@ const NewsletterForm = () => {
   };
 
   return (
-    <Card className="bg-primary/5">
-      <CardHeader>
-        <CardTitle className="text-center">Stay Updated</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="flex-1"
-            required
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? "Subscribing..." : "Subscribe"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+    <div className="text-center">
+      <h2 className="text-2xl font-bold mb-4">Stay in the Loop</h2>
+      <p className="text-gray-600 mb-8 max-w-md mx-auto">
+        Subscribe to our newsletter to get updates about new projects and features.
+      </p>
+      <form onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1"
+          required
+        />
+        <Button type="submit" disabled={loading}>
+          {loading ? "Subscribing..." : "Subscribe"}
+        </Button>
+      </form>
+    </div>
   );
 };
 
