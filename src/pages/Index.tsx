@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-secondary">
+    <div className="min-h-screen bg-secondary flex flex-col">
       <section className="pt-20 pb-8 px-4 animate-fadeIn">
         <div className="container">
           <div className="flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
