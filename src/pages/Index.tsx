@@ -49,21 +49,6 @@ const fetchCategories = async () => {
 const Index = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -94,21 +79,12 @@ const Index = () => {
       <section className="pt-6 pb-8 px-4 animate-fadeIn">
         <div className="container">
           <div className="flex justify-end mb-8">
-            {isAuthenticated ? (
-              <Button asChild>
-                <Link to="/submit">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Submit Project
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild variant="outline">
-                <Link to="/auth">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
-                </Link>
-              </Button>
-            )}
+            <Button asChild>
+              <Link to="/submit">
+                <Plus className="mr-2 h-4 w-4" />
+                Submit Project
+              </Link>
+            </Button>
           </div>
           <div className="flex flex-col items-center justify-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
