@@ -61,19 +61,12 @@ const App = () => (
             <Route path="/auth/callback" element={<Auth />} />
             <Route path="/auth/confirmation" element={<AuthConfirmation />} />
             <Route path="/project-submitted" element={<ProjectSubmitted />} />
+            <Route path="/submit" element={<SubmitProject />} />
             <Route
               path="/my-projects"
               element={
                 <PrivateRoute>
                   <MyProjects />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/submit"
-              element={
-                <PrivateRoute>
-                  <SubmitProject />
                 </PrivateRoute>
               }
             />

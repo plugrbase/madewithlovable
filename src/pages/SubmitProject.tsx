@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,23 +19,18 @@ const SubmitProject = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is authenticated
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate('/auth');
-      }
-    });
-  }, [navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Get current user
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) throw new Error('You must be logged in to submit a project');
+      // Get current user if logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      let userId = null;
+      
+      if (session) {
+        userId = session.user.id;
+      }
 
       let imageUrl = null;
       if (imageFile) {
@@ -68,7 +63,7 @@ const SubmitProject = () => {
             twitter_profile: twitterProfile,
             image_url: imageUrl,
             status: 'pending',
-            user_id: session.user.id
+            user_id: userId
           },
         ]);
 
