@@ -47,10 +47,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {isLoggedIn && (
         <div className="absolute top-4 right-4 z-50">
           <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            size="default"
             onClick={handleLogout}
-            className="hover:bg-secondary"
+            className="border-black"
           >
             <LogOut className="h-5 w-5" />
           </Button>
