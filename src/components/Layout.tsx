@@ -50,7 +50,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             variant="outline"
             size="default"
             onClick={handleLogout}
-            className="border-black"
+            className="border-gray-200"
           >
             <LogOut className="h-5 w-5" />
           </Button>
