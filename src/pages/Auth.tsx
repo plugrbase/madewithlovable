@@ -67,7 +67,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: 'https://awbqsxvxuqwzwmufpyvs.supabase.co/auth/v1/callback'
         }
       });
       if (error) throw error;
