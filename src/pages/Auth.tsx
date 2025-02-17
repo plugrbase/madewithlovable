@@ -23,7 +23,7 @@ const Auth = () => {
     if (location.pathname === '/auth/callback') {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          navigate('/');
+          navigate('/submit');
         }
       });
     }
@@ -67,7 +67,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: 'https://awbqsxvxuqwzwmufpyvs.supabase.co/auth/v1/callback'
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       });
       if (error) throw error;
