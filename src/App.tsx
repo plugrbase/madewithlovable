@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthConfirmation from "./pages/AuthConfirmation";
@@ -51,31 +52,33 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/project/:id" element={<Project />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/auth/callback" element={<Auth />} />
-          <Route path="/auth/confirmation" element={<AuthConfirmation />} />
-          <Route path="/project-submitted" element={<ProjectSubmitted />} />
-          <Route
-            path="/submit"
-            element={
-              <PrivateRoute>
-                <SubmitProject />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute>
-                <Admin />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/project/:id" element={<Project />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<Auth />} />
+            <Route path="/auth/confirmation" element={<AuthConfirmation />} />
+            <Route path="/project-submitted" element={<ProjectSubmitted />} />
+            <Route
+              path="/submit"
+              element={
+                <PrivateRoute>
+                  <SubmitProject />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <PrivateRoute>
+                  <Admin />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
